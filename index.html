@@ -1,0 +1,413 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>NanoChat</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: linear-gradient(135deg, #667eea, #764ba2);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      padding: 20px;
+      margin: 0;
+    }
+
+    .chat-container {
+      width: 100%;
+      max-width: 450px;
+      height: 90vh;
+      max-height: 700px;
+      background: #fff;
+      border-radius: 20px;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+      position: relative;
+    }
+
+    .chat-header {
+      background: linear-gradient(to right, #4a60d4, #6a11cb);
+      color: #fff;
+      padding: 18px 20px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    }
+
+    .header-content {
+      display: flex;
+      align-items: center;
+    }
+
+    .bot-avatar {
+      width: 40px;
+      height: 40px;
+      background: rgba(255, 255, 255, 0.2);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-right: 12px;
+      font-size: 20px;
+    }
+
+    .header-text h2 {
+      font-size: 18px;
+      font-weight: 600;
+      margin: 0;
+    }
+
+    .header-text p {
+      font-size: 12px;
+      opacity: 0.8;
+      margin: 2px 0 0;
+    }
+
+    #chatbox {
+      flex: 1;
+      padding: 20px;
+      overflow-y: auto;
+      background: #f8f9fa;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .message {
+      max-width: 80%;
+      padding: 12px 16px;
+      border-radius: 18px;
+      font-size: 15px;
+      line-height: 1.4;
+      position: relative;
+      animation: fadeIn 0.3s ease;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .user {
+      background: #4a60d4;
+      color: #fff;
+      align-self: flex-end;
+      border-bottom-right-radius: 5px;
+    }
+
+    .bot {
+      background: #fff;
+      color: #333;
+      align-self: flex-start;
+      border-bottom-left-radius: 5px;
+      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+    }
+
+    .typing-indicator {
+      display: none;
+      background: #fff;
+      color: #333;
+      align-self: flex-start;
+      border-bottom-left-radius: 5px;
+      padding: 12px 16px;
+      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+      max-width: 80%;
+    }
+
+    .typing-indicator span {
+      height: 8px;
+      width: 8px;
+      float: left;
+      margin: 0 1px;
+      background-color: #9E9EA1;
+      display: block;
+      border-radius: 50%;
+      opacity: 0.4;
+    }
+
+    .typing-indicator span:nth-of-type(1) {
+      animation: typing 1s infinite;
+    }
+
+    .typing-indicator span:nth-of-type(2) {
+      animation: typing 1s 0.33s infinite;
+    }
+
+    .typing-indicator span:nth-of-type(3) {
+      animation: typing 1s 0.66s infinite;
+    }
+
+    @keyframes typing {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-5px); }
+    }
+
+    .timestamp {
+      font-size: 10px;
+      opacity: 0.6;
+      margin-top: 4px;
+      text-align: right;
+    }
+
+    .chat-input-container {
+      display: flex;
+      border-top: 1px solid #e0e0e0;
+      background: #fff;
+      padding: 15px;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .chat-input-container input {
+      flex: 1;
+      border: none;
+      outline: 2px dotted #4a60d4;
+      outline-offset: -2px;
+      padding: 12px 16px;
+      border-radius: 24px;
+      background: #f0f0f0;
+      font-size: 15px;
+      transition: all 0.3s;
+    }
+
+    .chat-input-container input:focus {
+      background: #e8e8e8;
+      outline-offset: 2px;
+    }
+
+    .send-button {
+      width: 46px;
+      height: 46px;
+      border: none;
+      border-radius: 50%;
+      background: #4a60d4;
+      color: #fff;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: background 0.3s, transform 0.2s;
+    }
+
+    .send-button:hover {
+      background: #3a4fcf;
+    }
+
+    .send-button:active {
+      transform: scale(0.95);
+    }
+
+    /* Mobile optimizations */
+    @media (max-width: 480px) {
+      .chat-container {
+        height: 100vh;
+        max-height: 100%;
+        border-radius: 0;
+      }
+      
+      body {
+        padding: 0;
+      }
+      
+      .message {
+        max-width: 85%;
+      }
+      
+      .chat-header {
+        border-radius: 0;
+      }
+    }
+
+    /* Scrollbar styling */
+    #chatbox::-webkit-scrollbar {
+      width: 6px;
+    }
+
+    #chatbox::-webkit-scrollbar-track {
+      background: #f1f1f1;
+    }
+
+    #chatbox::-webkit-scrollbar-thumb {
+      background: #c1c1c1;
+      border-radius: 3px;
+    }
+
+    #chatbox::-webkit-scrollbar-thumb:hover {
+      background: #a8a8a8;
+    }
+
+    .suggestion-chips {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-top: 10px;
+      padding: 10px 0;
+    }
+
+    .chip {
+      background: #e8ebf9;
+      color: #4a60d4;
+      padding: 8px 16px;
+      border-radius: 16px;
+      font-size: 13px;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .chip:hover {
+      background: #dce0f5;
+      transform: translateY(-2px);
+    }
+  </style>
+</head>
+<body>
+  <div class="chat-container">
+    <div class="chat-header">
+      <div class="header-content">
+        <div class="bot-avatar">
+          <i class="fas fa-robot"></i>
+        </div>
+        <div class="header-text">
+          <h2>NanoChat</h2>
+          <p>Online now</p>
+        </div>
+      </div>
+    </div>
+    
+    <div id="chatbox">
+      <div class="message bot">
+        Hello! I'm your Nano Assistant How can I help you today?
+        <div class="timestamp">Just now</div>
+        
+        <div class="suggestion-chips">
+          <div class="chip" onclick="suggestionClick('What is AI')">What is AI</div>
+          <div class="chip" onclick="suggestionClick('What is ML?')">What is ML</div>
+          <div class="chip" onclick="suggestionClick('Summarize')">  Summarize</div>
+        </div>
+      </div>
+      
+      <div class="typing-indicator">
+        <span></span>
+        <span></span>
+        <span></span>
+      </div>
+    </div>
+    
+    <div class="chat-input-container">
+      <input type="text" id="input" placeholder="Type a message..." onkeypress="if(event.key==='Enter'){sendMessage()}">
+      <button class="send-button" onclick="sendMessage()">
+        <i class="fas fa-paper-plane"></i>
+      </button>
+    </div>
+  </div>
+
+  <script>
+    const chatbox = document.getElementById("chatbox");
+    const input = document.getElementById("input");
+    const typingIndicator = document.querySelector('.typing-indicator');
+    
+    // Initial focus on input
+    input.focus();
+    
+    // Add example messages on load
+    window.addEventListener('load', () => {
+      // Add a slight delay for initial messages to simulate conversation start
+      setTimeout(() => {
+        addBotMessage("I can help you with workflow automation, answer questions about n8n, or assist with troubleshooting. What would you like to know?");
+      }, 1000);
+    });
+    
+    function suggestionClick(text) {
+      input.value = text;
+      sendMessage();
+    }
+    
+    function addBotMessage(text) {
+      const botDiv = document.createElement("div");
+      botDiv.className = "message bot";
+      botDiv.innerHTML = text + '<div class="timestamp">' + getCurrentTime() + '</div>';
+      chatbox.appendChild(botDiv);
+      chatbox.scrollTop = chatbox.scrollHeight;
+    }
+    
+    function getCurrentTime() {
+      const now = new Date();
+      return now.getHours().toString().padStart(2, '0') + ':' + 
+             now.getMinutes().toString().padStart(2, '0');
+    }
+    
+    async function sendMessage() {
+      const userMsg = input.value.trim();
+      
+      if (!userMsg) return;
+      
+      // Add user message
+      const userDiv = document.createElement("div");
+      userDiv.className = "message user";
+      userDiv.innerHTML = userMsg + '<div class="timestamp">' + getCurrentTime() + '</div>';
+      chatbox.appendChild(userDiv);
+      
+      input.value = "";
+      chatbox.scrollTop = chatbox.scrollHeight;
+      
+      // Show typing indicator
+      typingIndicator.style.display = 'block';
+      chatbox.scrollTop = chatbox.scrollHeight;
+      
+      try {
+        // Simulate network delay for demo purposes
+        await new Promise(resolve => setTimeout(resolve, 1500));
+        
+        let response = await fetch("https://n8n-h1u7.onrender.com/webhook/chatbot", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ message: userMsg })
+        });
+        
+        let text = await response.text();
+        let data;
+        
+        try {
+          data = JSON.parse(text);
+        } catch (e) {
+          data = { reply: text };
+        }
+        
+        // Hide typing indicator
+        typingIndicator.style.display = 'none';
+        
+        // Add bot response
+        const botDiv = document.createElement("div");
+        botDiv.className = "message bot";
+        botDiv.innerHTML = (data.reply || "No response") + '<div class="timestamp">' + getCurrentTime() + '</div>';
+        chatbox.appendChild(botDiv);
+        
+      } catch (error) {
+        // Hide typing indicator
+        typingIndicator.style.display = 'none';
+        
+        const errorDiv = document.createElement("div");
+        errorDiv.className = "message bot";
+        errorDiv.innerHTML = "⚠️ Sorry, I'm having trouble connecting right now. Please try again later." + 
+                             '<div class="timestamp">' + getCurrentTime() + '</div>';
+        chatbox.appendChild(errorDiv);
+      }
+      
+      chatbox.scrollTop = chatbox.scrollHeight;
+    }
+  </script>
+</body>
+</html>
