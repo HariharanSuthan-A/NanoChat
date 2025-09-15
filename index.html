@@ -325,7 +325,10 @@
     // Add example messages on load
     window.addEventListener('load', () => {
       // Add a slight delay for initial messages to simulate conversation start
-    
+      setTimeout(() => {
+        addBotMessage("I can help you with workflow automation, answer questions about n8n, or assist with troubleshooting. What would you like to know?");
+      }, 1000);
+    });
     
     function suggestionClick(text) {
       input.value = text;
@@ -368,7 +371,7 @@
         // Simulate network delay for demo purposes
         await new Promise(resolve => setTimeout(resolve, 1500));
         
-        let response = await fetch("https://n8n-h1u7.onrender.com/webhook/chatbot", {
+        let response = await fetch("http://localhost:5678/webhook/chatbot", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ message: userMsg })
