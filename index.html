@@ -371,7 +371,7 @@
         // Simulate network delay for demo purposes
         await new Promise(resolve => setTimeout(resolve, 1500));
         
-        let response = await fetch("http://localhost:5678/webhook/chatbot", {
+        let response = await fetch("http://localhost:5678/webhook/chat", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ message: userMsg })
